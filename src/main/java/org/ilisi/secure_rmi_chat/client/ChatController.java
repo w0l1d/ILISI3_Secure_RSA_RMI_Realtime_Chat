@@ -77,7 +77,6 @@ public class ChatController implements ChatControllable {
         lblConvTitle.setWrapText(true);
 
 
-        //TODO :: load list of active users
         btnSend.setText("Send");
         txtMsg.setPromptText("Type your message here");
         btnSend.setOnAction(this::onSendMessage);
