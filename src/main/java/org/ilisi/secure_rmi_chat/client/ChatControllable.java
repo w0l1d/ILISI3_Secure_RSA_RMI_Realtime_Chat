@@ -3,13 +3,23 @@ package org.ilisi.secure_rmi_chat.client;
 import java.util.List;
 
 public interface ChatControllable {
-    public void receiveMessage(String message, User sender);
+    // receive message from server with sender `sender`
+    // this method is called when the client receives a message
+    void receiveMessage(String message, User sender);
 
-    public void updateActiveUsersList(List<User> activeUsers);
+    // receive list of active users from server
+    // this method is called when the client joins the chat
+    void updateActiveUsersList(List<User> activeUsers);
 
-    public void addActiveUser(User user);
+    // receive notification from server that a new user has joined
+    // this method is called when a new user joins the chat
+    void addActiveUser(User user);
 
-    public void removeActiveUser(User user);
+    // receive notification from server that a user has left
+    // this method is called when a user leaves the chat
+    void removeActiveUser(User user);
 
-    public void leaveChat();
+    // leave chat and close client
+    // this method is called when the client leaves the chat
+    void leaveChat();
 }

@@ -17,8 +17,11 @@ public class MessageCryptoClient {
     // Constructor to generate public and private keys
     public MessageCryptoClient() {
         try {
+            // Generate public and private keys
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048); // You can adjust the key size as needed
+            // You can adjust the key size as needed
+            keyPairGenerator.initialize(2048);
+            // Generate the key pair
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
             publicKey = keyPair.getPublic();
             privateKey = keyPair.getPrivate();
@@ -32,14 +35,14 @@ public class MessageCryptoClient {
         try {
 
             // Convert sender's public key from string
-            byte[] keyBytes = Base64.getDecoder().decode(receiverPublicKey);
-            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PublicKey senderPublicKey = keyFactory.generatePublic(spec);
+            PublicKey senderPublicKey = getPublicKeyFromString(receiverPublicKey);
 
             // Encrypt the message
             Cipher cipher = Cipher.getInstance("RSA");
+            // set the cipher to encrypt mode and use the receiver's public key to encrypt the message
             cipher.init(Cipher.ENCRYPT_MODE, senderPublicKey);
+            // encode the encrypted message to base64 string
+            // this is to ensure the encrypted message can be sent as a string
             return Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes()));
 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
@@ -51,9 +54,19 @@ public class MessageCryptoClient {
         return null;
     }
 
-    // Method to get the public key as a string
-    public String getPublicKeyAsString() {
+    private static PublicKey getPublicKeyFromString(String receiverPublicKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        // Convert the string to public key format
+        byte[] keyBytes = Base64.getDecoder().decode(receiverPublicKey);
+        // Create a key specification
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+        // Get the public key from the specification
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PublicKey senderPublicKey = keyFactory.generatePublic(spec);
+        return senderPublicKey;
+    }
 
+    // get the public key as a string
+    public String getPublicKeyAsString() {
         return Base64.getEncoder().encodeToString(publicKey.getEncoded());
     }
 

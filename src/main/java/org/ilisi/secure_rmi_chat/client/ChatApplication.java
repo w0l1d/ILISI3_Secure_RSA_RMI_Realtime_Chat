@@ -15,9 +15,12 @@ public class ChatApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 600, 450);
         stage.setTitle("Hello!");
         stage.setScene(scene);
+        // close chat when window is closed
         stage.setOnCloseRequest(event -> {
+            // close application
             if (ChatClient.getInstance() != null) {
                 try {
+                    // leave chat
                     ChatClient.getInstance().leaveChat();
                 } catch (Exception e) {
                     e.printStackTrace();

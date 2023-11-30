@@ -1,8 +1,7 @@
 package org.ilisi.secure_rmi_chat.client;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.rmi.*;
+import java.rmi.RemoteException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -20,7 +19,7 @@ public class User implements Serializable {
     }
 
     public String toString() {
-    	return this.username + "\n---(" + this.id + ")";
+        return this.username + "\n---(" + this.id + ")";
     }
 
     @Override
@@ -40,10 +39,6 @@ public class User implements Serializable {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -54,10 +49,6 @@ public class User implements Serializable {
 
     public String getPublicKey() {
         return publicKey;
-    }
-
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
     }
 
 }

@@ -1,5 +1,6 @@
 package org.ilisi.secure_rmi_chat.client;
 
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 
 import java.net.MalformedURLException;
@@ -13,7 +14,6 @@ public class ChatClient extends UnicastRemoteObject implements IChatClient {
 
 
     private static ChatClient instance;
-    private boolean connectionProblem = false;
 
     private ChatControllable chatControllable;
 
@@ -30,24 +30,23 @@ public class ChatClient extends UnicastRemoteObject implements IChatClient {
 
     private void registerClientToRMIServer(String clientServiceName) throws RemoteException {
         try {
+            // register client to rmi server
             Naming.rebind("rmi://localhost/" + clientServiceName, this);
-        } catch (ConnectException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Connection problem");
-            alert.setContentText("The server seems to be unavailable\nPlease try later");
-            connectionProblem = true;
-            e.printStackTrace();
-        } catch (MalformedURLException me) {
-            connectionProblem = true;
-            me.printStackTrace();
+        } catch (ConnectException | MalformedURLException e) {
+            // if rmi server is not running
+            Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("RMI Server is not running");
+                alert.setContentText("Please start RMI Server first");
+                alert.showAndWait();
+            });
+            System.exit(0);
         }
 
         System.out.println("Client Listen RMI Server is running...\n");
     }
 
-    public boolean isConnectionProblem() {
-        return connectionProblem;
-    }
 
     @Override
     public void receiveMessage(String cryptedMessage, User sender) {
@@ -58,8 +57,8 @@ public class ChatClient extends UnicastRemoteObject implements IChatClient {
 
     @Override
     public void updateActiveUsersList(List<User> activeUsers) {
-        System.out.println("Active users list updated");
-        activeUsers.forEach(user -> System.out.println(user.getUsername()));
+        System.out.println("Active users list updated : " + activeUsers.stream().map(User::getUsername).toList());
+        // update active users list
         chatControllable.updateActiveUsersList(activeUsers);
     }
 

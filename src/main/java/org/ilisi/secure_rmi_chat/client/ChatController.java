@@ -132,6 +132,19 @@ public class ChatController implements ChatControllable {
                 messages.add(message1.toLabel(lstConv.getWidth()));
                 lstConv.refresh();
             });
+        } else {
+            Platform.runLater(() -> {
+                // highlight the user in the list of active users with unread messages
+                lstActiveUsers.getItems().stream()
+                        .filter(user -> user.equals(sender))
+                        .findFirst()
+                        .ifPresent(user -> {
+                            if (!user.getUsername().endsWith(" (new messages)")) {
+                                user.setUsername(user.getUsername() + " (new messages)");
+                                lstActiveUsers.refresh();
+                            }
+                        });
+            });
         }
     }
 
@@ -193,22 +206,29 @@ public class ChatController implements ChatControllable {
 
     public void onUserSelected(MouseEvent mouseEvent) {
         System.out.println("onUserSelected");
+        // if the user double clicked, do nothing
         if (mouseEvent.getClickCount() != 1) {
             return;
         }
+        // if no user is selected, do nothing
         if (lstActiveUsers.getSelectionModel().getSelectedItem() == null) {
             return;
         }
+        // if the user is already selected, do nothing
         if (lstActiveUsers.getSelectionModel().getSelectedItem().equals(selectedUser)) {
             return;
         }
+        // get the selected user
         selectedUser = lstActiveUsers.getSelectionModel().getSelectedItem();
+        // set the style of the conversation title
         lblConvTitle.setStyle("-fx-font-style: normal;" +
                 " -fx-font-size: 14px;  -fx-text-fill: #5e5e5e;" +
                 " -fx-background-color: #9bff84;");
-
+        // set the title of the conversation
         lblConvTitle.setText("Conversation with " + selectedUser.getUsername());
+        // clear the messages list
         messages.clear();
+        // add the messages of the selected user to the messages list
         conversations.stream()
                 .filter(chat -> chat.getUser().equals(selectedUser))
                 .findFirst()
@@ -217,6 +237,19 @@ public class ChatController implements ChatControllable {
                 .getMessages()
                 .forEach(message -> {
                     messages.add(message.toLabel(lstConv.getWidth()));
+                });
+        // refresh the messages list
+        lstConv.refresh();
+        // remove the highlight from the user in the list of active users
+        lstActiveUsers.getItems().stream()
+                .filter(user -> user.equals(selectedUser))
+                .findFirst()
+                .ifPresent(user -> {
+                    // remove the highlight from the user in the list of active users
+                    if (user.getUsername().endsWith(" (new messages)")) {
+                        user.setUsername(user.getUsername().replace(" (new messages)", ""));
+                        lstActiveUsers.refresh();
+                    }
                 });
     }
 }
